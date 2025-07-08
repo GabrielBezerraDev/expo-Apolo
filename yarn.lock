@@ -6466,6 +6466,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"expo-image-loader@npm:~5.1.0":
+  version: 5.1.0
+  resolution: "expo-image-loader@npm:5.1.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/7c99e534dff619090f39f753e460471e4a84cc868ea21269e3c060f348e216c3ad1f0762512a048885d88380e4c4b763a77ac9d4688a85d31b0ee61834613968
+  languageName: node
+  linkType: hard
+
+"expo-image-manipulator@npm:~13.1.7":
+  version: 13.1.7
+  resolution: "expo-image-manipulator@npm:13.1.7"
+  dependencies:
+    expo-image-loader: "npm:~5.1.0"
+  peerDependencies:
+    expo: "*"
+  checksum: 10/ae012584132872c23bfb33ad1a3745e0ffcd7323de44ce0ede33b0dc98c08f8ff4d29ea238f12c2a0e0482bc6bbc29ebf69c7d829214c8ad36c6a47a4d86ff09
+  languageName: node
+  linkType: hard
+
 "expo-json-utils@npm:~0.15.0":
   version: 0.15.0
   resolution: "expo-json-utils@npm:0.15.0"
@@ -6610,6 +6630,7 @@ __metadata:
     expo-camera: "npm:^16.1.10"
     expo-dev-client: "npm:~5.2.4"
     expo-font: "npm:~13.3.1"
+    expo-image-manipulator: "npm:~13.1.7"
     expo-linking: "npm:~7.1.4"
     expo-modules-core: "npm:^2.4.2"
     expo-router: "npm:~5.0.5"

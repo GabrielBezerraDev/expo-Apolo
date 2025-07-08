@@ -1,35 +1,42 @@
-import React, { useCallback, useEffect, useState } from "react";
+// components/ListItems.js
+
+import React, { useEffect, useState } from "react";
 import { FlashList } from "@shopify/flash-list";
 import { getAxios } from "services/axios-api";
 import CardComponent from "components/Card";
-import { Button, View } from "tamagui";
+import { View } from "tamagui";
+import { Alert, ActivityIndicator } from "react-native"; // Importe ActivityIndicator
 
 const fieldDefinitions = [
   { label: "Nome", value: "firstname" },
-  { label: "Email", value: (user: any) => user.email.toUpperCase() },
+  { label: "Email", value: (user) => user.email.toUpperCase() },
 ];
 
 export const ListItems = () => {
   const [data, setData] = useState<any[]>([]);
+  // NOVO: Adicione estados para loading e erro
+  const [loading, setLoading] = useState(true);
+
+
 
   useEffect(() => {
-    const getUsers = async () => {
-      const users = await getAxios(
-        "https://fakerapi.it/api/v2/users?_quantity=20&_gender=male"
-      );
-      setData((users.data as any)["data"]);
-    };
-    getUsers();
+    const getUsers = async () => {};
   }, []);
 
-  const renderFlashList = useCallback(() => {
+  // Enquanto estiver carregando, mostre um indicador
+  if (loading) {
+    return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
+  }
+
+  // O useCallback não é estritamente necessário aqui, mas mantendo a estrutura
+  const renderFlashList = () => {
     return (
       <FlashList
         data={data}
         estimatedItemSize={200}
-        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical:40 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 40 }}
         ItemSeparatorComponent={() => <View height="$2" />}
-        renderItem={({ item }: { item: any }) => {
+        renderItem={({ item }) => {
           const formattedData = fieldDefinitions.map((field) => ({
             label: field.label,
             value:
@@ -41,7 +48,7 @@ export const ListItems = () => {
         }}
       />
     );
-  }, [data]);
+  };
 
   return renderFlashList();
 };
