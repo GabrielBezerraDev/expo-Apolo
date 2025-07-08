@@ -21,7 +21,7 @@ const fetchPalletInfoWithAxios = async (palletNumber) => {
   const bodyData = {
     class: "GetPalletInfo",
     method: "GetPallet",
-    pallet: palletNumber b,
+    pallet: palletNumber,
   };
 
   // try {
