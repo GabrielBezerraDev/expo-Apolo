@@ -43,11 +43,9 @@ export default function RootLayout() {
   }
 
   return (
-    <PortalProvider shouldAddRootHost>
-      <Providers>
-        <RootLayoutNav />
-      </Providers>
-    </PortalProvider>
+    <Providers>
+      <RootLayoutNav />
+    </Providers>
   );
 }
 
@@ -59,7 +57,7 @@ function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const theme = useTheme();
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+    <>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
       <Stack>
         <Stack.Screen
@@ -90,6 +88,6 @@ function RootLayoutNav() {
           }}
         />
       </Stack>
-    </ThemeProvider>
+    </>
   );
 }

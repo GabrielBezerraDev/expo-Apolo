@@ -1,8 +1,9 @@
 import axios, { AxiosResponse } from 'axios'
 import { Alert } from 'react-native';
 
+
 export const api = axios.create({
-    baseURL: 'http://localhost:8000/api/v1/',
+    // baseURL: 'http://localhost:8000/api/v1/',
     timeout: 10000,
 })
 

@@ -1,27 +1,23 @@
-import { XStackTheme } from "components/Layout/Flexbox/StackTheme";
-import { ComponentProps, ComponentType } from "react";
-import { Card, Text } from "tamagui";
+import { Card, Text, View, CardProps } from "tamagui";
 
-type CallbackData = (data:any) => any;
-
-interface IDataCard{
-    label: string;
-    value: (any | CallbackData);
+interface CardComponentProps extends CardProps {
+  data: { label: string; value: any }[];
 }
 
-interface CardComponentProps extends ComponentProps<typeof Card>{
-    data: IDataCard[];
-}
-
-export default function CardComponent(props:CardComponentProps) {
+export default function CardComponent({ data, ...cardProps }: CardComponentProps) {
   return (
-    <Card>
-      <Card.Header />
+    <Card elevation={5} bordered  {...cardProps}>
+      <Card.Header>
+        <Text>Teste</Text>
+      </Card.Header>
       <Card.Footer />
-        <XStackTheme>
-            {/* {props.data.map(data) => } */}
-            <Text></Text>  
-        </XStackTheme>
+      <View style={{ display: "grid", gridTemplateColumns: "repeat(2, 1fr)", padding:10 }}>
+        {data.map((item, index) => (
+          <View key={index}>
+            <Text>{`${item.label}: ${item.value}`}</Text>
+          </View>
+        ))}
+      </View>
       <Card.Background />
     </Card>
   );

@@ -3,14 +3,9 @@ import { Input, XStack, YStack, styled, Button } from "tamagui";
 import { CircleX } from "@tamagui/lucide-icons";
 import LabelComponent from "components/Label";
 import { XStackTheme, YStackTheme } from "components/Layout/Flexbox/StackTheme";
+import { ButtonTheme } from "components/Button";
 
 export const InputCustom = styled(Input, {});
-const ButtonICon = styled(Button, {
-  color: "white",
-  bg: "#f0052c",
-  flex: 1,
-  rounded: "$0",
-});
 
 interface IInputComponentProps {
   textPlaceHolder?: string;
@@ -45,7 +40,7 @@ export default function InputComponent(props: IInputComponentProps) {
             />
           )}
         />
-        <ButtonICon
+        <ButtonTheme
           height={props.size ?? "$6"}
           icon={<CircleX size="$1" />}
           onPress={() => setValue(props.nameInput,"")}
