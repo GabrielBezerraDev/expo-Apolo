@@ -199,9 +199,12 @@ export default function Home() {
         </CameraView>
       </View>
     ) : (
-      <YStackTheme flex={1} p="$4">
+      <YStackTheme display="flex" flex={1} p="$4">
         <ListItems />
         <ButtonTheme
+
+          marginInline={"$1"}
+          width={"100%"}
           iconAfter={<CirclePlus />}
           onPress={() => setShowCamera(true)}
         >

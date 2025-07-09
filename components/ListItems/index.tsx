@@ -25,7 +25,7 @@ export const ListItems = () => {
 
   // Enquanto estiver carregando, mostre um indicador
   if (loading) {
-    return <ActivityIndicator size="large" style={{ marginTop: 50 }} />;
+    return <ActivityIndicator size="large" style={{ flex:1 }} />;
   }
 
   // O useCallback não é estritamente necessário aqui, mas mantendo a estrutura
@@ -34,6 +34,7 @@ export const ListItems = () => {
       <FlashList
         data={data}
         estimatedItemSize={200}
+        style={{flex:1}}
         contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 40 }}
         ItemSeparatorComponent={() => <View height="$2" />}
         renderItem={({ item }) => {
