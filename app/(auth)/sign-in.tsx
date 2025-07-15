@@ -27,12 +27,12 @@ export default function SignInScreen() {
         <InputComponent
           callbackTreatment={handleInputEmail}
           nameInput="username"
-          textLabel="teste"
+          textLabel="Email"
           textPlaceHolder=""
         ></InputComponent>
         <InputComponent
           nameInput="password"
-          textLabel="teste"
+          textLabel="Senha"
           textPlaceHolder=""
         ></InputComponent>
       </FormComponent>
