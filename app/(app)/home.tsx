@@ -163,11 +163,6 @@ export default function Home() {
           ),
           genericComponentWithDialog: (
             <>
-              <Dialog.Trigger asChild key="trigger">
-                <ButtonTheme>
-                  <Button.Text>teste</Button.Text>
-                </ButtonTheme>
-              </Dialog.Trigger>
               <YStackTheme
                 width={"100%"}
                 key="stack"
@@ -178,13 +173,14 @@ export default function Home() {
               >
                 <Text>Bem-vindo ao App!</Text>
               </YStackTheme>
-              <ButtonTheme
-                onPress={() => setShowCamera(true)}
-                icon={<CirclePlus />}
-                width={"100%"}
-              >
-                Abrir Câmera
-              </ButtonTheme>
+              <Dialog.Trigger asChild key="trigger">
+                <ButtonTheme
+                  icon={<CirclePlus />}
+                  width={"100%"}
+                >
+                  Abrir Câmera
+                </ButtonTheme>
+              </Dialog.Trigger>
             </>
           ),
         }}
@@ -198,7 +194,7 @@ export default function Home() {
     overlayLayout,
     cameraRef,
     setShowCamera,
-    scannedValue, // Adicionado para atualizar em tempo real
+    scannedValue,
   ]);
 
   return renderHomeScreen();

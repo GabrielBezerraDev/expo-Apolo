@@ -37,8 +37,23 @@ const items = [
   { name: "Durian" },
 ];
 
+interface SelectItem {
+  name: string; 
+  id: any;
+  callbackItem: (...args: any[]) => void;
+  icon?: Icon;
+}
+
+interface SelectComponentProps extends SelectProps {
+  trigger?: React.ReactNode;
+  selectItems: SelectItem[];
+}
+
 export function SelectComponent(
-  props: SelectProps & { trigger?: React.ReactNode; onItemSelect?: (item: string) => void }
+  props: SelectProps & {
+    trigger?: React.ReactNode;
+    onItemSelect?: (item: string) => void;
+  }
 ) {
   const [val, setVal] = React.useState(items[0].name.toLowerCase());
 

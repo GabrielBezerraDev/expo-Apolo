@@ -3,6 +3,7 @@ import { Dialog, DialogProps } from "tamagui"; // or '@tamagui/dialog'
 interface IDialogComponent extends DialogProps {
   contentDialog: React.ReactNode;
   genericComponentWithDialog: React.ReactNode;
+
 }
 
 export const DialogComponent = ({ props }: { props: IDialogComponent }) => {
@@ -13,7 +14,7 @@ export const DialogComponent = ({ props }: { props: IDialogComponent }) => {
       <Dialog.Portal>
         <Dialog.Overlay
           key="overlay"
-          backgroundColor="$shadow6"
+          bg="$shadow6"
           animateOnly={["transform", "opacity"]}
           animation={[
             "quicker",
