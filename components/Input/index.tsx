@@ -17,7 +17,7 @@ interface IInputComponentProps {
 }
 
 export default function InputComponent(props: IInputComponentProps) {
-  const { control, setValue } = useFormContext(); 
+  const { control, setValue } = useFormContext();
 
   return (
     <YStackTheme gap="$1">
@@ -27,23 +27,25 @@ export default function InputComponent(props: IInputComponentProps) {
           name={props.nameInput}
           control={control}
           render={({ field }) => (
-            <InputCustom
-              placeholder={props.textPlaceHolder}
-              size={props.size ?? "$6"}
-              flex={15}
-              rounded="$0"
-              onChangeText={(text) => {
-                field.onChange(text);
-                props.callbackTreatment?.(text);
-              }}
-              value={field.value}
-            />
+            <XStackTheme width={"100%"}>
+              <InputCustom
+                placeholder={props.textPlaceHolder}
+                size={props.size ?? "$6"}
+                flex={15}
+                rounded="$0"
+                onChangeText={(text) => {
+                  field.onChange(text);
+                  props.callbackTreatment?.(text);
+                }}
+                value={field.value}
+              />
+              <ButtonTheme
+                height={props.size ?? "$6"}
+                icon={<CircleX size="$1" />}
+                onPress={() => setValue(props.nameInput, "")}
+              />
+            </XStackTheme>
           )}
-        />
-        <ButtonTheme
-          height={props.size ?? "$6"}
-          icon={<CircleX size="$1" />}
-          onPress={() => setValue(props.nameInput,"")}
         />
       </XStackTheme>
     </YStackTheme>

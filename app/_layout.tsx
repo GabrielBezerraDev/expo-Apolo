@@ -59,7 +59,11 @@ function RootLayoutNav() {
   return (
     <>
       <StatusBar style={colorScheme === "dark" ? "light" : "dark"} />
-      <Stack>
+      <Stack
+        screenOptions={{
+          headerShown: false
+        }}
+      >
         <Stack.Screen
           name="(app)/home"
           options={{

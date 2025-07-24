@@ -169,7 +169,6 @@ export default function Home() {
                 flex={1}
                 justify="center"
                 items="center"
-                space
               >
                 <Text>Bem-vindo ao App!</Text>
               </YStackTheme>
@@ -177,6 +176,7 @@ export default function Home() {
                 <ButtonTheme
                   icon={<CirclePlus />}
                   width={"100%"}
+                  onPress={() => setShowCamera(!showCamera)}
                 >
                   Abrir Câmera
                 </ButtonTheme>
@@ -209,8 +209,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   scannerFrame: {
-    width: "50%",
-    height: 80,
+    width: "80%",
+    height: 200,
     borderColor: "white",
     borderWidth: 2,
     borderRadius: 20,
