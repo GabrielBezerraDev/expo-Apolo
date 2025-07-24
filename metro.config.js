@@ -6,11 +6,14 @@ const { getDefaultConfig } = require('expo/metro-config')
 const { withTamagui } = require('@tamagui/metro-plugin')
 
 const config = getDefaultConfig(__dirname, {
-  // [Web-only]: Enables CSS support in Metro.
-  isCSSEnabled: true,
+  isCSSEnabled: true, // [Web-only]: Enables CSS support in Metro.
 })
 
-config.resolver.sourceExts.push('mjs')
+// --- Alterações para suportar SVG ---
+config.transformer.babelTransformerPath = require.resolve('react-native-svg-transformer')
+config.resolver.assetExts = config.resolver.assetExts.filter((ext) => ext !== 'svg')
+config.resolver.sourceExts.push('svg', 'mjs')
+// -------------------------------------
 
 module.exports = withTamagui(config, {
   components: ['tamagui'],

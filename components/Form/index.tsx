@@ -1,7 +1,12 @@
 import React from "react";
 import type { SizeTokens } from "tamagui";
 import { Button, Form, H4, ScrollView, Spinner, View, YStack } from "tamagui";
-import { FormProvider, useForm } from "react-hook-form";
+import {
+  FieldValues,
+  FormProvider,
+  useForm,
+  UseFormReturn,
+} from "react-hook-form";
 import { XStackTheme, YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import { ButtonTheme } from "components/Button";
 
@@ -13,7 +18,10 @@ export function FormComponent({
   occupyAllSpace = true,
   headerForm,
   footerForm,
+  methods,
+  disabledButton = false,
 }: {
+  methods: UseFormReturn<FieldValues, any, FieldValues>;
   size?: SizeTokens;
   textHeaderForm?: string;
   children: React.ReactNode;
@@ -21,12 +29,11 @@ export function FormComponent({
   occupyAllSpace: boolean;
   headerForm?: React.ReactNode;
   footerForm?: React.ReactNode;
+  disabledButton: boolean;
 }) {
   const [status, setStatus] = React.useState<
     "off" | "submitting" | "submitted"
   >("off");
-
-  const methods = useForm();
 
   const onSubmit = (data: any) => {
     setStatus("submitting");
@@ -47,14 +54,14 @@ export function FormComponent({
           flex={occupyAllSpace ? 1 : 0}
           width={"100%"}
           justify={"space-between"}
-          alignItems={"center"}
-          minWidth={300}
+          items={"center"}
+          minW={300}
           gap="$2"
           borderWidth={1}
-          borderRadius="$4"
-          backgroundColor="$background"
+          rounded="$4"
+          bg="$background"
           borderColor="$borderColor"
-          padding="$8"
+          p="$8"
         >
           <XStackTheme width={"100%"} justify={"flex-start"}>
             <H4>{textHeaderForm}</H4>
@@ -71,6 +78,8 @@ export function FormComponent({
               width={"100%"}
               onPress={methods.handleSubmit(onSubmit)}
               icon={status === "submitting" ? () => <Spinner /> : undefined}
+              disabled={disabledButton}
+              isDisabled={disabledButton}
             >
               Confirmar Dados
             </ButtonTheme>

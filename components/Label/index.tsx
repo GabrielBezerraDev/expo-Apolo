@@ -7,5 +7,5 @@ interface ILabelComponent extends ComponentProps<typeof Label>{
 }
 
 export default function LabelComponent(props: ILabelComponent){
-    return <Label fontSize={props.fontSize ?? "$8" }  width={props.width ?? "100%"}  htmlFor={props.htmlFor}>{props.textLabel}</Label>
+    return <Label fontSize={props.fontSize ?? "$5" }  width={props.width ?? "100%"}  htmlFor={props.htmlFor}>{props.textLabel}</Label>
 }

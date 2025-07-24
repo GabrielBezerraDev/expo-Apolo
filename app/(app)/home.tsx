@@ -1,15 +1,16 @@
-import React, { useCallback, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
 import { CameraView } from "expo-camera";
 import { Button, Dialog, Text, View } from "tamagui";
 import { Alert, StyleSheet } from "react-native";
 import { YStackTheme } from "components/Layout/Flexbox/StackTheme";
-import { ListItems } from "components/ListItems";
 import { ButtonTheme } from "components/Button";
 import { CirclePlus, X, Camera as CameraIcon } from "@tamagui/lucide-icons";
 import axios from "axios";
 import { useCameraScanner } from "hooks/useCameraScanner";
 import { DialogComponent } from "components/Dialog";
 import { SelectComponent } from "components/Select";
+import { useFirebase } from "hooks/useFirebase";
+import { IModelData } from "protocol/IModelData";
 
 const fetchPalletInfoWithAxios = async (palletNumber) => {
   const url = "http://172.21.70.100:7070/rest-secure.php";
@@ -55,6 +56,19 @@ export default function Home() {
       await fetchPalletInfoWithAxios(batch);
     }
   });
+
+  const [modelsData, setModelsData] = useState<IModelData[]>();
+  const [modelData, setModelData] = useState<IModelData>();
+
+  const { getAll } = useFirebase();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const data = await getAll();
+      setModelsData(data);
+    };
+    fetchData();
+  }, [getAll]);
 
   const lastScanned = useRef<string | null>(null);
   const [scannedValue, setScannedValue] = useState<string>("");
@@ -155,7 +169,12 @@ export default function Home() {
           contentDialog: (
             <YStackTheme>
               <Text>Teste</Text>
-              <SelectComponent />
+              <SelectComponent<IModelData> item={modelData as IModelData} setItem={setModelData as Dispatch<SetStateAction<IModelData>>}  items={modelsData as IModelData[]} selectItems={(modelsData as any).map((modelData:IModelData,index:number) => {
+                return {
+                  id: index,
+                  name: modelData.modelName
+                }
+              })} />
               <Dialog.Close asChild>
                 <ButtonTheme circular icon={<X />} />
               </Dialog.Close>
@@ -173,10 +192,8 @@ export default function Home() {
                 <Text>Bem-vindo ao App!</Text>
               </YStackTheme>
               <Dialog.Trigger asChild key="trigger">
-                <ButtonTheme
-                  icon={<CirclePlus />}
-                  width={"100%"}
-                  onPress={() => setShowCamera(!showCamera)}
+                <ButtonTheme icon={<CirclePlus />} width={"100%"} 
+                onPress={() => setShowCamera(!showCamera)}
                 >
                   Abrir Câmera
                 </ButtonTheme>

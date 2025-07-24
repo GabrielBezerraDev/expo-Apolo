@@ -1,6 +1,6 @@
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
 import { YStackTheme } from "components/Layout/Flexbox/StackTheme";
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 import { LinearGradient } from "react-native-svg";
 import {
   Adapt,
@@ -12,30 +12,6 @@ import {
   Sheet,
 } from "tamagui";
 
-const items = [
-  { name: "Apple" },
-  { name: "Pear" },
-  { name: "Blackberry" },
-  { name: "Peach" },
-  { name: "Apricot" },
-  { name: "Melon" },
-  { name: "Honeydew" },
-  { name: "Starfruit" },
-  { name: "Blueberry" },
-  { name: "Raspberry" },
-  { name: "Strawberry" },
-  { name: "Mango" },
-  { name: "Pineapple" },
-  { name: "Lime" },
-  { name: "Lemon" },
-  { name: "Coconut" },
-  { name: "Guava" },
-  { name: "Papaya" },
-  { name: "Orange" },
-  { name: "Grape" },
-  { name: "Jackfruit" },
-  { name: "Durian" },
-];
 
 interface SelectItem {
   name: string; 
@@ -44,29 +20,31 @@ interface SelectItem {
   icon?: Icon;
 }
 
-interface SelectComponentProps extends SelectProps {
+interface SelectComponentProps<T> extends SelectProps {
   trigger?: React.ReactNode;
   selectItems: SelectItem[];
+  items: T[];
+  setItem: Dispatch<SetStateAction<T>>;
+  item: T;
 }
 
-export function SelectComponent(
-  props: SelectProps & {
+export function SelectComponent<T>(
+  props: SelectComponentProps<T> & {
     trigger?: React.ReactNode;
     onItemSelect?: (item: string) => void;
   }
 ) {
-  const [val, setVal] = React.useState(items[0].name.toLowerCase());
 
-  const handleSelect = (item: string) => {
-    setVal(item);
-    if (props.onItemSelect) {
-      props.onItemSelect(item);
-    }
+  const handleSelect = (item: SelectItem) => {
+    props.setItem(props.items.find((data:T,index:number) => index === item.id) as T);
+    // if (props.onItemSelect) {
+    //   props.onItemSelect(item);
+    // }
   };
 
   return (
     <Select
-      value={val}
+      value={props.item}
       onValueChange={handleSelect}
       disablePreventBodyScroll
       {...props}
@@ -121,7 +99,7 @@ export function SelectComponent(
         <Select.Viewport>
           <Select.Group>
             <Select.Label>Fruits</Select.Label>
-            {items.map((item, i) => (
+            {props.selectItems.map((item, i) => (
               <Select.Item
                 index={i}
                 key={item.name}
