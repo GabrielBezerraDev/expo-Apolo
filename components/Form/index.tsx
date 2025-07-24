@@ -1,21 +1,30 @@
 import React from "react";
 import type { SizeTokens } from "tamagui";
-import { Button, Form, H4, Spinner, View, YStack } from "tamagui";
+import { Button, Form, H4, ScrollView, Spinner, View, YStack } from "tamagui";
 import { FormProvider, useForm } from "react-hook-form";
-import { YStackTheme } from "components/Layout/Flexbox/StackTheme";
+import { XStackTheme, YStackTheme } from "components/Layout/Flexbox/StackTheme";
+import { ButtonTheme } from "components/Button";
 
 export function FormComponent({
   size,
   textHeaderForm,
   children,
-  callbackSubmit
+  callbackSubmit,
+  occupyAllSpace = true,
+  headerForm,
+  footerForm,
 }: {
-  size: SizeTokens;
+  size?: SizeTokens;
   textHeaderForm?: string;
   children: React.ReactNode;
   callbackSubmit: (data: any) => void;
+  occupyAllSpace: boolean;
+  headerForm?: React.ReactNode;
+  footerForm?: React.ReactNode;
 }) {
-  const [status, setStatus] = React.useState<"off" | "submitting" | "submitted">("off");
+  const [status, setStatus] = React.useState<
+    "off" | "submitting" | "submitted"
+  >("off");
 
   const methods = useForm();
 
@@ -33,10 +42,11 @@ export function FormComponent({
 
   return (
     <FormProvider {...methods}>
-      <YStackTheme width={"80%"}>
+      <YStackTheme flex={occupyAllSpace ? 1 : 0}>
         <Form
+          flex={occupyAllSpace ? 1 : 0}
           width={"100%"}
-          justify={"center"}
+          justify={"space-between"}
           alignItems={"center"}
           minWidth={300}
           gap="$2"
@@ -46,18 +56,25 @@ export function FormComponent({
           borderColor="$borderColor"
           padding="$8"
         >
-          <H4>{textHeaderForm}</H4>
-          <YStack width={"100%"} gap={"$12"}>
-            {children}
-            <Form.Trigger asChild disabled={status !== "off"}>
-              <Button
-                onPress={methods.handleSubmit(onSubmit)}
-                icon={status === "submitting" ? () => <Spinner /> : undefined}
-              >
-                Submit
-              </Button>
-            </Form.Trigger>
-          </YStack>
+          <XStackTheme width={"100%"} justify={"flex-start"}>
+            <H4>{textHeaderForm}</H4>
+          </XStackTheme>
+          {headerForm ?? <></>}
+          <ScrollView width={"100%"}>
+            <YStack width={"100%"} gap={"$3"}>
+              {children}
+            </YStack>
+          </ScrollView>
+          {footerForm ?? <></>}
+          <Form.Trigger asChild disabled={status !== "off"}>
+            <ButtonTheme
+              width={"100%"}
+              onPress={methods.handleSubmit(onSubmit)}
+              icon={status === "submitting" ? () => <Spinner /> : undefined}
+            >
+              Confirmar Dados
+            </ButtonTheme>
+          </Form.Trigger>
         </Form>
       </YStackTheme>
     </FormProvider>
