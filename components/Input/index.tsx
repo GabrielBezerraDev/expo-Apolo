@@ -1,6 +1,6 @@
 import { Controller, useFormContext } from "react-hook-form";
-import { Input, XStack, YStack, styled, Button } from "tamagui";
-import { CircleX } from "@tamagui/lucide-icons";
+import { Input, styled } from "tamagui";
+import { CircleX, Eraser } from "@tamagui/lucide-icons";
 import LabelComponent from "components/Label";
 import { XStackTheme, YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import { ButtonTheme } from "components/Button";
@@ -12,13 +12,13 @@ export interface IInputComponentProps {
   textLabel?: string;
   clearInput?: boolean;
   size?: any;
+  value?: string;
   callbackTreatment?: (data: any) => void;
   nameInput: string;
 }
 
 export default function InputComponent(props: IInputComponentProps) {
-  const { control, setValue } = useFormContext(); 
-
+  const { control, setValue } = useFormContext();
   return (
     <YStackTheme gap="$1">
       {props.textLabel && <LabelComponent textLabel={props.textLabel} />}
@@ -26,6 +26,7 @@ export default function InputComponent(props: IInputComponentProps) {
         <Controller
           name={props.nameInput}
           control={control}
+          defaultValue={props.value ?? ""} 
           render={({ field }) => (
             <InputCustom
               placeholder={props.textPlaceHolder}
@@ -36,14 +37,15 @@ export default function InputComponent(props: IInputComponentProps) {
                 field.onChange(text);
                 props.callbackTreatment?.(text);
               }}
+              readOnly={true}
               value={field.value}
             />
           )}
         />
         <ButtonTheme
           height={props.size ?? "$6"}
-          icon={<CircleX size="$1" />}
-          onPress={() => setValue(props.nameInput,"")}
+          icon={<Eraser size="$1" />}
+          onPress={() => setValue(props.nameInput, "")}
         />
       </XStackTheme>
     </YStackTheme>

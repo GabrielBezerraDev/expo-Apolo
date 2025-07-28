@@ -6,11 +6,12 @@ import InputComponent from "components/Input";
 import { XStackTheme, YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import TextAreaComponent from "components/TextArea";
 import { useFirebase } from "hooks/useFirebase";
-import { IModelDataItem } from "protocol/IModelData";
-import { useState } from "react";
+import { IModelData, IModelDataItem } from "protocol/interfaces/IModelData";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "react-native";
 import { Text } from "tamagui";
+import { ECollections } from '../../protocol/Enum/ECollections';
 
 
 
@@ -22,12 +23,15 @@ export default function FormIa() {
       prevData.filter((data: IModelDataItem) => data.keyData !== keyData)
     );
   };
-  const { createPost } = useFirebase();
+  const { createPost, setCurrentCollection } = useFirebase();
+
+  useEffect(() => setCurrentCollection(ECollections["ModelData"]),[]);
+
   return (
     <FormComponent
       methods={methods}
       callbackSubmit={() => {
-        createPost({
+        createPost<IModelData>({
           modelName: methods.getValues("model"),
           modelDataList: dataToIA
         });
@@ -69,7 +73,7 @@ export default function FormIa() {
                   ...prevData,
                   {
                     keyData: methods.getValues("keyData"),
-                    description: methods.getValues("description"),
+                    description: methods.getValues("description") ?? "",
                   },
                 ]);
               }}

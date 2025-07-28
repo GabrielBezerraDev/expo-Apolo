@@ -1,6 +1,7 @@
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
 import { YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import React, { Dispatch, SetStateAction } from "react";
+import { Alert } from "react-native";
 import { LinearGradient } from "react-native-svg";
 import {
   Adapt,
@@ -16,7 +17,7 @@ import {
 interface SelectItem {
   name: string; 
   id: any;
-  callbackItem: (...args: any[]) => void;
+  callbackItem?: (...args: any[]) => void;
   icon?: Icon;
 }
 
@@ -26,6 +27,7 @@ interface SelectComponentProps<T> extends SelectProps {
   items: T[];
   setItem: Dispatch<SetStateAction<T>>;
   item: T;
+  keyFilter: keyof T;
 }
 
 export function SelectComponent<T>(
@@ -35,16 +37,13 @@ export function SelectComponent<T>(
   }
 ) {
 
-  const handleSelect = (item: SelectItem) => {
-    props.setItem(props.items.find((data:T,index:number) => index === item.id) as T);
-    // if (props.onItemSelect) {
-    //   props.onItemSelect(item);
-    // }
+  const handleSelect = (item: string) => {
+    props.setItem(props.items.find((data:T) => data[props.keyFilter] === item) as T);
   };
 
   return (
     <Select
-      value={props.item}
+      value={props.item[props.keyFilter] as string}
       onValueChange={handleSelect}
       disablePreventBodyScroll
       {...props}
@@ -103,7 +102,7 @@ export function SelectComponent<T>(
               <Select.Item
                 index={i}
                 key={item.name}
-                value={item.name.toLowerCase()}
+                value={item.name}
               >
                 <Select.ItemText>{item.name}</Select.ItemText>
                 <Select.ItemIndicator>

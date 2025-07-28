@@ -1,4 +1,11 @@
-import { Dispatch, SetStateAction, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Dispatch,
+  SetStateAction,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import { CameraView } from "expo-camera";
 import { Button, Dialog, Text, View } from "tamagui";
 import { Alert, StyleSheet } from "react-native";
@@ -10,7 +17,8 @@ import { useCameraScanner } from "hooks/useCameraScanner";
 import { DialogComponent } from "components/Dialog";
 import { SelectComponent } from "components/Select";
 import { useFirebase } from "hooks/useFirebase";
-import { IModelData } from "protocol/IModelData";
+import { IModelData, IModelDataItem } from "protocol/interfaces/IModelData";
+import { ECollections } from "protocol/Enum/ECollections";
 
 const fetchPalletInfoWithAxios = async (palletNumber) => {
   const url = "http://172.21.70.100:7070/rest-secure.php";
@@ -34,10 +42,6 @@ const fetchPalletInfoWithAxios = async (palletNumber) => {
     data: bodyData,
     timeout: 15000,
   });
-
-  console.log("Resposta da API (com axios):", response.data);
-
-  Alert.alert("Dados Recebidos", JSON.stringify(response.data, null, 2));
 };
 
 export default function Home() {
@@ -57,18 +61,41 @@ export default function Home() {
     }
   });
 
-  const [modelsData, setModelsData] = useState<IModelData[]>();
+  const [modelsData, setModelsData] = useState<IModelData[]>([]);
   const [modelData, setModelData] = useState<IModelData>();
+  const [promptDataIA, setPromptDataIA] = useState<string>();
 
-  const { getAll } = useFirebase();
+  const { getAll, setCurrentCollection, currentCollection } = useFirebase();
+
+  useEffect(() => {
+    setCurrentCollection(ECollections["ModelData"]);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getAll();
+      const data = await getAll<IModelData>();
       setModelsData(data);
+      setModelData(data[0]);
     };
     fetchData();
-  }, [getAll]);
+  }, [currentCollection]);
+
+  useEffect(() => {
+    let promptIA: string = `I will give you a document for you to OCR and I will describe to you what data I want you to capture from that document:\n\n ${modelData?.modelDataList
+      .map(
+        (modelItem: IModelDataItem) =>
+          `Search by: ${modelItem.keyData}\n data description: ${
+            modelItem.description
+              ? modelItem.description
+              : "No details for this data"
+          }\n The key for this data must be exactly this: ${modelItem.keyData}`
+      )
+      .join(
+        "\n\n"
+      )}\n\nI want you to return this data to me in an object without nesting, just key value in the data.`;
+    console.log(promptIA);
+    setPromptDataIA(promptIA);
+  }, [modelData]);
 
   const lastScanned = useRef<string | null>(null);
   const [scannedValue, setScannedValue] = useState<string>("");
@@ -78,19 +105,27 @@ export default function Home() {
     const centerX = bounds.origin.x + bounds.size.width / 2;
     const centerY = bounds.origin.y + bounds.size.height / 2;
     setScannedValue(data); // Mostra em tempo real
-
-    // if (
-    //   centerX >= x &&
-    //   centerX <= x + width &&
-    //   centerY >= y &&
-    //   centerY <= y + height
-    // ) {
-    //   if (lastScanned.current !== data) {
-    //     lastScanned.current = data;
-    //     // processa o código se quiser
-    //   }
-    // }
   };
+
+  const renderSelect = useCallback(() => {
+    if (modelsData.length > 0) {
+      return (
+        <SelectComponent<IModelData>
+          keyFilter="modelName"
+          item={modelData as IModelData}
+          setItem={setModelData as Dispatch<SetStateAction<IModelData>>}
+          items={modelsData as IModelData[]}
+          selectItems={modelsData.map(
+            (modelData: IModelData, index: number) => ({
+              id: index,
+              name: modelData.modelName,
+            })
+          )}
+        />
+      );
+    }
+    return null;
+  }, [modelsData, modelData]);
 
   const renderHomeScreen = useCallback(() => {
     if (!permission?.granted) {
@@ -154,7 +189,7 @@ export default function Home() {
           <ButtonTheme
             rounded={"$radius.10"}
             elevation={5}
-            onPress={handleTakePicture}
+            onPress={() => handleTakePicture(promptDataIA as string)}
             icon={<CameraIcon />}
             circular
             position="absolute"
@@ -167,19 +202,15 @@ export default function Home() {
       <DialogComponent
         props={{
           contentDialog: (
-            <YStackTheme>
-              <Text>Teste</Text>
-              <SelectComponent<IModelData> item={modelData as IModelData} setItem={setModelData as Dispatch<SetStateAction<IModelData>>}  items={modelsData as IModelData[]} selectItems={(modelsData as any).map((modelData:IModelData,index:number) => {
-                return {
-                  id: index,
-                  name: modelData.modelName
-                }
-              })} />
-              <Dialog.Close asChild>
-                <ButtonTheme circular icon={<X />} />
-              </Dialog.Close>
+            <YStackTheme rowGap={"$5"}>
+              <Text fontSize={"$5"}>Selecione o modelo dos dados:</Text>
+              {renderSelect()}
+              <ButtonTheme onPress={() => setShowCamera(!showCamera)}>
+                Acessar Câmera
+              </ButtonTheme>
             </YStackTheme>
           ),
+          titleModal: "Cadastro IA",
           genericComponentWithDialog: (
             <>
               <YStackTheme
@@ -192,9 +223,7 @@ export default function Home() {
                 <Text>Bem-vindo ao App!</Text>
               </YStackTheme>
               <Dialog.Trigger asChild key="trigger">
-                <ButtonTheme icon={<CirclePlus />} width={"100%"} 
-                onPress={() => setShowCamera(!showCamera)}
-                >
+                <ButtonTheme icon={<CirclePlus />} width={"100%"}>
                   Abrir Câmera
                 </ButtonTheme>
               </Dialog.Trigger>
@@ -212,6 +241,7 @@ export default function Home() {
     cameraRef,
     setShowCamera,
     scannedValue,
+    modelsData,
   ]);
 
   return renderHomeScreen();

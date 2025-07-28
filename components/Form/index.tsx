@@ -1,12 +1,7 @@
 import React from "react";
 import type { SizeTokens } from "tamagui";
-import { Button, Form, H4, ScrollView, Spinner, View, YStack } from "tamagui";
-import {
-  FieldValues,
-  FormProvider,
-  useForm,
-  UseFormReturn,
-} from "react-hook-form";
+import { Form, H4, ScrollView, Spinner, YStack } from "tamagui";
+import { FieldValues, FormProvider, UseFormReturn } from "react-hook-form";
 import { XStackTheme, YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import { ButtonTheme } from "components/Button";
 
