@@ -44,37 +44,57 @@ export function FormComponent({
 
   return (
     <FormProvider {...methods}>
-      <YStackTheme flex={occupyAllSpace ? 1 : 0}>
+      <YStackTheme
+        flex={occupyAllSpace ? 1 : 0}
+        width="100%"
+        height="100%"
+        maxW="100%"
+        maxH="100%"
+      >
         <Form
           flex={occupyAllSpace ? 1 : 0}
-          width={"100%"}
-          justify={"space-between"}
-          items={"center"}
+          width="100%"
+          height={occupyAllSpace ? "100%" : "auto"}
+          maxW="100%"
+          maxH="100%"
+          alignSelf="stretch"
+          justify="space-between"
+          alignItems="center"
           minW={300}
           gap="$2"
           borderWidth={1}
-          rounded="$4"
-          bg="$background"
+          borderRadius="$4"
+          backgroundColor="$background"
           borderColor="$borderColor"
-          p="$8"
+          padding="$8"
         >
-          <XStackTheme width={"100%"} justify={"flex-start"}>
+          <XStackTheme width="100%" justify="flex-start">
             <H4>{textHeaderForm}</H4>
           </XStackTheme>
-          {headerForm ?? <></>}
-          <ScrollView width={"100%"}>
-            <YStack width={"100%"} gap={"$3"}>
-              {children}
-            </YStack>
+
+          {headerForm && headerForm}
+
+          <ScrollView
+            width="100%"
+            flex={1}
+            maxH="100%"
+            contentContainerStyle={{
+              flexGrow: 1,
+              width: "100%",
+            }}
+          >
+            {children}
           </ScrollView>
-          {footerForm ?? <></>}
-          <Form.Trigger asChild disabled={status !== "off"}>
+
+          {footerForm && footerForm}
+
+          <Form.Trigger asChild disabled={disabledButton}>
             <ButtonTheme
-              width={"100%"}
+              width="100%"
               onPress={methods.handleSubmit(onSubmit)}
               icon={status === "submitting" ? () => <Spinner /> : undefined}
               disabled={disabledButton}
-              isDisabled={disabledButton}
+              $isDisabled={disabledButton}
             >
               Confirmar Dados
             </ButtonTheme>

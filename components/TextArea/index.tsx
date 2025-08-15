@@ -11,11 +11,13 @@ export default function TextAreaComponent(props: IInputComponentProps) {
     <Controller
       name={props.nameInput}
       control={control}
+      rules={props.rules ?? {}}
       render={({ field }) => (
         <YStackTheme>
           {props.textLabel && <LabelComponent textLabel={props.textLabel} />}
           <TextArea
             value={field.value}
+            readOnly={props.readonly ?? false}
             onChangeText={field.onChange}  
             onBlur={field.onBlur}         
             size="$1"

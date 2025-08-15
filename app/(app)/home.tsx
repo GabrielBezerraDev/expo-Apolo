@@ -9,6 +9,7 @@ import {
 import { CameraView } from "expo-camera";
 import { Button, Dialog, Text, View } from "tamagui";
 import { Alert, StyleSheet } from "react-native";
+import { FlashList } from "@shopify/flash-list";
 import { YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import { ButtonTheme } from "components/Button";
 import { CirclePlus, X, Camera as CameraIcon } from "@tamagui/lucide-icons";
@@ -16,9 +17,8 @@ import axios from "axios";
 import { useCameraScanner } from "hooks/useCameraScanner";
 import { DialogComponent } from "components/Dialog";
 import { SelectComponent } from "components/Select";
-import { useFirebase } from "hooks/useFirebase";
 import { IModelData, IModelDataItem } from "protocol/interfaces/IModelData";
-import { ECollections } from "protocol/Enum/ECollections";
+import { useModelData } from "hooks/useModelData";
 
 const fetchPalletInfoWithAxios = async (palletNumber) => {
   const url = "http://172.21.70.100:7070/rest-secure.php";
@@ -61,41 +61,31 @@ export default function Home() {
     }
   });
 
-  const [modelsData, setModelsData] = useState<IModelData[]>([]);
-  const [modelData, setModelData] = useState<IModelData>();
+  const [modelDataSelected, setModelDataSelected] = useState<IModelData>(
+    {} as IModelData
+  );
   const [promptDataIA, setPromptDataIA] = useState<string>();
 
-  const { getAll, setCurrentCollection, currentCollection } = useFirebase();
+  const { modelsData } = useModelData();
 
   useEffect(() => {
-    setCurrentCollection(ECollections["ModelData"]);
-  }, []);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const data = await getAll<IModelData>();
-      setModelsData(data);
-      setModelData(data[0]);
-    };
-    fetchData();
-  }, [currentCollection]);
-
-  useEffect(() => {
-    let promptIA: string = `I will give you a document for you to OCR and I will describe to you what data I want you to capture from that document:\n\n ${modelData?.modelDataList
-      .map(
-        (modelItem: IModelDataItem) =>
-          `Search by: ${modelItem.keyData}\n data description: ${
-            modelItem.description
-              ? modelItem.description
-              : "No details for this data"
-          }\n The key for this data must be exactly this: ${modelItem.keyData}`
-      )
-      .join(
-        "\n\n"
-      )}\n\nI want you to return this data to me in an object without nesting, just key value in the data.`;
+    let promptIA: string = `I will give you a document for you to OCR and I will describe to you what data I want you to capture from that document:\n\n ${
+      modelDataSelected?.modelDataList
+        ?.map(
+          (modelItem: IModelDataItem) =>
+            `Search by: ${modelItem.keyData}\n data description: ${
+              modelItem.description
+                ? modelItem.description
+                : "No details for this data"
+            }\n The key for this data must be exactly this: ${
+              modelItem.keyData
+            }`
+        )
+        ?.join("\n\n") || ""
+    }\n\nI want you to return this data to me in an object without nesting, just key value in the data.`;
     console.log(promptIA);
     setPromptDataIA(promptIA);
-  }, [modelData]);
+  }, [modelDataSelected]);
 
   const lastScanned = useRef<string | null>(null);
   const [scannedValue, setScannedValue] = useState<string>("");
@@ -104,7 +94,7 @@ export default function Home() {
     const { x, y, width, height } = overlayLayout.current;
     const centerX = bounds.origin.x + bounds.size.width / 2;
     const centerY = bounds.origin.y + bounds.size.height / 2;
-    setScannedValue(data); // Mostra em tempo real
+    setScannedValue(data);
   };
 
   const renderSelect = useCallback(() => {
@@ -112,8 +102,8 @@ export default function Home() {
       return (
         <SelectComponent<IModelData>
           keyFilter="modelName"
-          item={modelData as IModelData}
-          setItem={setModelData as Dispatch<SetStateAction<IModelData>>}
+          item={modelDataSelected as IModelData}
+          setItem={setModelDataSelected as Dispatch<SetStateAction<IModelData>>}
           items={modelsData as IModelData[]}
           selectItems={modelsData.map(
             (modelData: IModelData, index: number) => ({
@@ -125,7 +115,62 @@ export default function Home() {
       );
     }
     return null;
-  }, [modelsData, modelData]);
+  }, [modelsData, modelDataSelected]);
+
+  // Componente para renderizar cada item da FlashList
+  const renderModelItem = useCallback(({ item }: { item: IModelData }) => {
+    return (
+      <View style={styles.listItem}>
+        <Text fontSize="$6" fontWeight="bold" color="$blue10">
+          {item.modelName}
+        </Text>
+      </View>
+    );
+  }, []);
+
+  // Header da FlashList
+  const renderListHeader = useCallback(() => {
+    return (
+      <View style={styles.listHeader}>
+        <Text fontSize="$8" fontWeight="bold" textAlign="center">
+          Modelos Disponíveis
+        </Text>
+        <Text
+          fontSize="$4"
+          color="$gray11"
+          textAlign="center"
+          marginBottom="$4"
+        >
+          Selecione um modelo para começar
+        </Text>
+      </View>
+    );
+  }, []);
+
+  // Footer da FlashList
+  const renderListFooter = useCallback(() => {
+    return (
+      <View style={styles.listFooter}>
+        <Text fontSize="$3" color="$gray10" textAlign="center">
+          {modelsData.length} modelo(s) carregado(s)
+        </Text>
+      </View>
+    );
+  }, [modelsData.length]);
+
+  // Componente vazio
+  const renderEmptyComponent = useCallback(() => {
+    return (
+      <View style={styles.emptyContainer}>
+        <Text fontSize="$6" textAlign="center" color="$gray11">
+          Nenhum modelo encontrado
+        </Text>
+        <Text fontSize="$4" textAlign="center" color="$gray10" marginTop="$2">
+          Carregue alguns modelos para começar
+        </Text>
+      </View>
+    );
+  }, []);
 
   const renderHomeScreen = useCallback(() => {
     if (!permission?.granted) {
@@ -157,7 +202,6 @@ export default function Home() {
           ref={cameraRef}
           style={styles.camera}
         >
-          {/* Caixa de texto no topo mostrando o dado em tempo real */}
           <View style={styles.topBox}>
             <Text style={styles.topBoxText}>
               {scannedValue
@@ -194,7 +238,7 @@ export default function Home() {
             circular
             position="absolute"
             b={"5%"}
-            alignSelf="center"
+            items="center"
           />
         </CameraView>
       </View>
@@ -213,15 +257,23 @@ export default function Home() {
           titleModal: "Cadastro IA",
           genericComponentWithDialog: (
             <>
-              <YStackTheme
-                width={"100%"}
-                key="stack"
-                flex={1}
-                justify="center"
-                items="center"
-              >
-                <Text>Bem-vindo ao App!</Text>
-              </YStackTheme>
+              <View style={styles.flashListContainer}>
+                {modelsData.length > 0 ? (
+                  <FlashList
+                    data={modelsData}
+                    renderItem={renderModelItem}
+                    keyExtractor={(item, index) => `${item.modelName}-${index}`}
+                    estimatedItemSize={120}
+                    ListHeaderComponent={renderListHeader}
+                    ListFooterComponent={renderListFooter}
+                    ListEmptyComponent={renderEmptyComponent}
+                    showsVerticalScrollIndicator={false}
+                    contentContainerStyle={styles.flashListContent}
+                  />
+                ) : (
+                  <Text>Teste</Text>
+                )}
+              </View>
               <Dialog.Trigger asChild key="trigger">
                 <ButtonTheme icon={<CirclePlus />} width={"100%"}>
                   Abrir Câmera
@@ -242,6 +294,10 @@ export default function Home() {
     setShowCamera,
     scannedValue,
     modelsData,
+    renderModelItem,
+    renderListHeader,
+    renderListFooter,
+    renderEmptyComponent,
   ]);
 
   return renderHomeScreen();
@@ -277,5 +333,44 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 18,
     fontWeight: "bold",
+  },
+  // Novos estilos para FlashList
+  flashListContainer: {
+    flex: 1,
+    width: "100%",
+    minHeight: 400, // Define uma altura mínima para o FlashList funcionar
+  },
+  flashListContent: {
+    paddingHorizontal: 16,
+  },
+  listItem: {
+    backgroundColor: "white",
+    borderRadius: 12,
+    padding: 16,
+    marginVertical: 8,
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+    borderWidth: 1,
+    borderColor: "#f0f0f0",
+  },
+  listHeader: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+  },
+  listFooter: {
+    paddingVertical: 20,
+    paddingHorizontal: 16,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingVertical: 40,
   },
 });

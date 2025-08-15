@@ -1,7 +1,7 @@
 import { Button, styled, ButtonProps } from "tamagui";
 
 type ButtonThemeProps = ButtonProps & {
-  isDisabled?: boolean;
+  $isDisabled?: boolean;
 };
 
 export const ButtonTheme = styled(Button, {
@@ -11,9 +11,9 @@ export const ButtonTheme = styled(Button, {
   animation: "bouncy",
 transition: "all 0.4s ease-out", 
   variants: {
-    isDisabled: {
+    $isDisabled: {
       true: {
-        bg: "$black10",
+        bg: "grey",
       },
     },
   },

@@ -6,14 +6,12 @@ import InputComponent from "components/Input";
 import { XStackTheme, YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import TextAreaComponent from "components/TextArea";
 import { useFirebase } from "hooks/useFirebase";
+import { ECollections } from "protocol/Enum/ECollections";
 import { IModelData, IModelDataItem } from "protocol/interfaces/IModelData";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Alert } from "react-native";
 import { Text } from "tamagui";
-import { ECollections } from '../../protocol/Enum/ECollections';
-
-
 
 export default function FormIa() {
   const methods = useForm();
@@ -23,9 +21,8 @@ export default function FormIa() {
       prevData.filter((data: IModelDataItem) => data.keyData !== keyData)
     );
   };
-  const { createPost, setCurrentCollection } = useFirebase();
+  const { createPost } = useFirebase();
 
-  useEffect(() => setCurrentCollection(ECollections["ModelData"]),[]);
 
   return (
     <FormComponent
@@ -33,20 +30,23 @@ export default function FormIa() {
       callbackSubmit={() => {
         createPost<IModelData>({
           modelName: methods.getValues("model"),
-          modelDataList: dataToIA
-        });
+          modelDataList: dataToIA,
+        }, ECollections["ModelData"]);
       }}
       textHeaderForm="Cadastro de dados para IA"
-      disabledButton={!dataToIA.length}
+      disabledButton={dataToIA.length === 0}
       headerForm={
         <YStackTheme rowGap={"$3"} width={"100%"}>
           <YStackTheme rowGap={"$10"}>
             <InputComponent
               textLabel="Modelo"
               nameInput="model"
+              callbackTreatment={() => {console.log(methods.formState.isValid)}}
               size={"$4"}
+              rules={{ required: true }}
             ></InputComponent>
             <InputComponent
+              rules={{ required: true }}
               size={"$4"}
               textLabel="Nome do Campo"
               nameInput="keyData"
@@ -59,6 +59,8 @@ export default function FormIa() {
           <XStackTheme columnGap={"$3"}>
             <ButtonTheme
               flex={1}
+              disabled={!methods.formState.isValid}
+              $isDisabled={!methods.formState.isValid}
               onPress={() => {
                 if (
                   dataToIA.some(
@@ -110,13 +112,13 @@ export default function FormIa() {
               </YStackTheme>
               <YStackTheme>
                 <Text fontWeight={"bold"}>Descrição para IA:</Text>
-                <Text>{data.description}</Text>
+                <Text>{data.description ? data.description : "Descrição não informada"}</Text>
               </YStackTheme>
               <HorizontalRow></HorizontalRow>
             </YStackTheme>
           ))
         ) : (
-          <YStackTheme items="center" justify="center">
+          <YStackTheme items="center" justify="center" flex={1}>
             <Text>Não há nenhum dado cadastrado!</Text>
           </YStackTheme>
         )}

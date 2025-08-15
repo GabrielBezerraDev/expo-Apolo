@@ -1,7 +1,6 @@
 import { Check, ChevronDown, ChevronUp } from "@tamagui/lucide-icons";
 import { YStackTheme } from "components/Layout/Flexbox/StackTheme";
 import React, { Dispatch, SetStateAction } from "react";
-import { Alert } from "react-native";
 import { LinearGradient } from "react-native-svg";
 import {
   Adapt,
@@ -101,7 +100,7 @@ export function SelectComponent<T>(
             {props.selectItems.map((item, i) => (
               <Select.Item
                 index={i}
-                key={item.name}
+                key={i}
                 value={item.name}
               >
                 <Select.ItemText>{item.name}</Select.ItemText>

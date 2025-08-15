@@ -6,6 +6,7 @@ import { config } from "../tamagui.config";
 import { PortalProvider } from "@tamagui/portal";
 import { FirebaseProvider } from "hooks/useFirebase";
 import ModalProvider from "hooks/useModal";
+import ModelDataProvider from "hooks/useModelData";
 
 export function Provider({
   children,
@@ -16,21 +17,23 @@ export function Provider({
   return (
     <ModalProvider>
       <FirebaseProvider>
-        <PortalProvider shouldAddRootHost>
-          <TamaguiProvider config={config} defaultTheme="light" {...rest}>
-            <PortalProvider shouldAddRootHost>
-              <ToastProvider
-                swipeDirection="horizontal"
-                duration={6000}
-                native={[]}
-              >
-                {children}
-                <CurrentToast />
-                <ToastViewport top="$8" left={0} right={0} />
-              </ToastProvider>
-            </PortalProvider>
-          </TamaguiProvider>
-        </PortalProvider>
+        <ModelDataProvider>
+          <PortalProvider shouldAddRootHost>
+            <TamaguiProvider config={config} defaultTheme="light" {...rest}>
+              <PortalProvider shouldAddRootHost>
+                <ToastProvider
+                  swipeDirection="horizontal"
+                  duration={6000}
+                  native={[]}
+                >
+                  {children}
+                  <CurrentToast />
+                  <ToastViewport top="$8" left={0} right={0} />
+                </ToastProvider>
+              </PortalProvider>
+            </TamaguiProvider>
+          </PortalProvider>
+        </ModelDataProvider>
       </FirebaseProvider>
     </ModalProvider>
   );
